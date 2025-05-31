@@ -2,8 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>小林的空投项目</title>
+    <meta name="theme-color" content="#3ec0fd">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
         html, body {
@@ -591,6 +597,19 @@
             }
         }
     </style>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                // 注册成功
+            }, function(err) {
+                // 注册失败
+                console.warn('ServiceWorker registration failed:', err);
+            });
+        });
+    }
+    </script>
+    <script defer src="https://analytics.vercel.com/script.js" data-website-id="请替换为你的ID"></script>
 </head>
 <body>
     <div class="pixel-border"></div>
