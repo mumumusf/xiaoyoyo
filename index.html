@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小林的空投项目</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            background: #3ec0fd;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #2053a2;
+            display: flex;
+            flex-direction: column;
+        }
+        .pixel-border {
+            width: 100vw;
+            height: 14px;
+            background: repeating-linear-gradient(90deg, #fff 0 8px, #3ec0fd 8px 16px);
+        }
+        .header-bar {
+            width: 100vw;
+            background: #2053a2;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            height: 100px;
+            border-bottom: 3px solid #183a6b;
+            position: relative;
+        }
+        .avatar {
+            width: 64px;
+            height: 64px;
+            max-width: 64px;
+            max-height: 64px;
+            border-radius: 16px;
+            border: 3px solid #3ec0fd;
+            background: #fff;
+            object-fit: cover;
+            margin-left: 18px;
+            margin-right: 24px;
+            box-shadow: 0 2px 0 #ffe066, 0 0 0 4px #fff, 4px 4px 0 #2053a2;
+            transition: transform 0.32s cubic-bezier(.4,1.4,.6,1), box-shadow 0.22s;
+            overflow: hidden;
+            display: block;
+        }
+        .header-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .header-title {
+            font-size: 2.3em;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .header-subtitle {
+            font-size: 1em;
+            color: #d0eaff;
+            margin-top: 6px;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .main-area {
+            flex: 1;
+            background: #3ec0fd;
+            width: 100vw;
+            min-height: 400px;
+            padding-bottom: 110px; /* 留出分页和footer空间 */
+        }
+        .footer-bar {
+            width: 100vw;
+            background: #2053a2;
+            border-top: 3px solid #183a6b;
+            padding: 0 0 8px 0;
+            text-align: center;
+            color: #fff;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            font-size: 1.08em;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+        }
+        .footer-bar.show {
+            opacity: 1;
+            pointer-events: auto;
+            animation: fadeInUp 0.4s;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .footer-links {
+            margin-top: 2px;
+            font-size: 1em;
+        }
+        .footer-links a {
+            color: #00ffd0;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover {
+            color: #ffe066;
+        }
+        @media (max-width: 600px) {
+            .header-bar { flex-direction: column; height: auto; padding: 8px 0; }
+            .avatar { margin: 0 0 8px 0; }
+            .header-center { margin: 0; }
+        }
+        @media (max-width: 700px) {
+            .avatar {
+                width: 38px;
+                height: 38px;
+                max-width: 38px;
+                max-height: 38px;
+                border-radius: 8px;
+                margin-left: 4px;
+                margin-right: 8px;
+            }
+            .header-bar {
+                height: auto;
+                padding: 4px 0;
+            }
+        }
+        .project-card-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px 24px;
+            justify-content: center;
+            align-items: start;
+            max-width: 1400px;
+            margin: 48px auto 0 auto;
+            min-height: 480px;
+        }
+        @media (max-width: 1100px) {
+            .project-card-list {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px 12px;
+            }
+        }
+        @media (max-width: 700px) {
+            .project-card-list {
+                grid-template-columns: 1fr;
+                gap: 14px 0;
+                margin: 18px auto 0 auto;
+                max-width: 98vw;
+            }
+            .project-card, .project-card.empty {
+                width: 99vw;
+                min-width: 0;
+                max-width: 99vw;
+                height: auto;
+                min-height: 260px;
+                padding: 18px 4px 12px 4px;
+            }
+            .project-title {
+                font-size: 1.18em;
+            }
+            .project-desc {
+                font-size: 1em;
+                padding: 4px 6px;
+            }
+            .project-meta {
+                font-size: 1em;
+                margin-bottom: 7px;
+            }
+            .project-meta span {
+                min-width: 36px;
+            }
+            .project-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                margin-bottom: 7px;
+            }
+            .detail-btn, .pagination-btn {
+                font-size: 1.18em;
+                padding: 12px 0;
+                border-radius: 10px;
+            }
+            .header-bar {
+                height: auto;
+                padding: 4px 0;
+            }
+            .avatar {
+                width: 44px;
+                height: 44px;
+                border-radius: 8px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .header-title {
+                font-size: 1.1em;
+                margin-top: 4px;
+            }
+            .footer-bar {
+                font-size: 0.98em;
+                padding-bottom: 2px;
+            }
+            .pagination-bar {
+                position: static;
+                margin: 18px 0 0 0;
+                background: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            .main-area {
+                padding-bottom: 80px;
+            }
+        }
+        .project-card {
+            width: 480px;
+            min-width: 480px;
+            max-width: 480px;
+            min-height: 400px;
+            height: 400px;
+            box-sizing: border-box;
+            background: #fffbe6;
+            border: 4px solid #2053a2;
+            border-radius: 20px;
+            box-shadow:
+                0 0 0 4px #fff,
+                8px 8px 0 0 #2053a2,
+                0 12px 24px 0 rgba(32,83,162,0.10);
+            padding: 44px 32px 32px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.22s cubic-bezier(.4,1.4,.6,1), transform 0.22s cubic-bezier(.4,1.4,.6,1), border-color 0.22s, filter 0.22s, background 0.22s;
+            position: relative;
+            padding-bottom: 64px;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .project-card:hover {
+            box-shadow:
+                0 0 0 4px #ffe066,
+                16px 16px 0 0 #2053a2,
+                0 24px 48px 0 rgba(255,224,102,0.18);
+            border-color: #ffe066;
+            transform: translateY(-12px) scale(1.045) rotate(-1deg);
+            z-index: 2;
+            filter: brightness(1.04) drop-shadow(0 2px 8px #ffe06633);
+            background: #fffde7;
+        }
+        .project-card:active {
+            transform: scale(0.98) translateY(2px);
+            filter: brightness(0.98);
+        }
+        .project-card.empty {
+            width: 480px;
+            min-width: 480px;
+            max-width: 480px;
+            min-height: 400px;
+            height: 400px;
+            background: transparent;
+            border: 4px dashed #b3e5fc;
+            box-shadow: 0 0 0 4px #fff, 4px 4px 0 0 #b3e5fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: emptyFadeIn 0.8s;
+        }
+        @keyframes emptyFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .empty-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #b0bec5;
+            font-size: 1em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            opacity: 0.7;
+            user-select: none;
+            height: 100%;
+            border: 2.5px solid #b3e5fc;
+            border-radius: 14px;
+            box-shadow: 0 0 0 2px #fff;
+            padding: 18px 0 10px 0;
+            animation: emptyFadeIn 0.8s;
+        }
+        .empty-placeholder .pixel-icon {
+            font-size: 1.5em;
+            margin-bottom: 4px;
+            color: #b3e5fc;
+            filter: blur(0.5px);
+            border-radius: 6px;
+            animation: pixelJump 2.2s infinite cubic-bezier(.4,1.4,.6,1), pixelColor 1.2s infinite alternate;
+        }
+        @keyframes pixelColor {
+            0% { color: #b3e5fc; filter: blur(0.5px); }
+            50% { color: #3ec0fd; filter: blur(0.2px); }
+            100% { color: #b3e5fc; filter: blur(0.5px); }
+        }
+        .project-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            border: 3px solid #3ec0fd;
+            background: #fff;
+            margin-bottom: 12px;
+            object-fit: contain;
+            box-shadow: 0 2px 0 #ffe066, 0 0 0 4px #fff, 4px 4px 0 #2053a2;
+            transition: transform 0.22s, box-shadow 0.22s;
+        }
+        .project-card:hover .project-avatar {
+            transform: rotate(-8deg) scale(1.13);
+        }
+        .project-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        .project-title {
+            font-size: 1.55em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+        .project-desc {
+            color: #333;
+            font-size: 1.13em;
+            margin-bottom: 18px;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            min-height: 32px;
+            font-weight: bold;
+            background: #fffde7;
+            border-radius: 8px;
+            padding: 6px 10px;
+            box-sizing: border-box;
+            display: inline-block;
+        }
+        .project-meta-group {
+            border-top: 1.5px dashed #e3f2fd;
+            margin-top: 12px;
+            padding-top: 10px;
+            width: 100%;
+        }
+        .project-meta {
+            color: #2053a2;
+            font-size: 1.08em;
+            margin-bottom: 10px;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            display: flex;
+            align-items: center;
+            line-height: 1.7;
+        }
+        .project-meta:last-child {
+            margin-bottom: 0;
+        }
+        .project-meta span {
+            color: #183a6b;
+            font-weight: bold;
+            min-width: 56px;
+            display: inline-block;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .project-meta a {
+            color: #00bfff;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .project-meta a:hover {
+            text-decoration: underline;
+            color: #ffb300;
+        }
+        .detail-btn {
+            position: absolute;
+            right: 28px;
+            bottom: 24px;
+            font-size: 1.13em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-weight: bold;
+            border: 2.5px solid #2053a2;
+            border-radius: 12px;
+            background: #2053a2;
+            color: #fff;
+            box-shadow: 2px 2px 0 #ffe066, 0 0 0 3px #fff;
+            padding: 8px 26px;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s, border-color 0.18s, transform 0.13s cubic-bezier(.4,1.4,.6,1);
+        }
+        .detail-btn:hover, .pagination-btn:hover:not(:disabled) {
+            transform: scale(1.07);
+        }
+        .detail-btn:active {
+            background: #ffe066;
+            color: #2053a2;
+            border-color: #ffe066;
+            box-shadow: 4px 4px 0 #2053a2, 0 0 0 4px #ffe066;
+            transform: scale(0.96);
+        }
+        .detail-btn.loading {
+            pointer-events: none;
+            background: #ffe066;
+            color: #2053a2;
+            border-color: #ffe066;
+            position: relative;
+        }
+        .detail-btn.loading .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin: 0 1px;
+            border-radius: 50%;
+            background: #2053a2;
+            animation: loadingDot 0.8s infinite alternate;
+        }
+        .detail-btn.loading .dot:nth-child(2) { animation-delay: 0.15s; }
+        .detail-btn.loading .dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes loadingDot {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        .pagination-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 32px 0 0 0;
+            width: 100%;
+            position: fixed;
+            left: 0;
+            bottom: 56px;
+            z-index: 10;
+            background: rgba(62,192,253,0.95);
+            padding: 12px 0 8px 0;
+            box-shadow: 0 -2px 8px 0 rgba(32,83,162,0.06);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+        }
+        .pagination-bar.show {
+            opacity: 1;
+            pointer-events: auto;
+            animation: fadeInUp 0.4s;
+        }
+        .pagination-btn {
+            background: #183a6b;
+            color: #fff;
+            border: 2.5px solid #2053a2;
+            border-radius: 14px;
+            padding: 8px 30px;
+            margin: 0 18px;
+            font-size: 1.13em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-weight: bold;
+            box-shadow: 2px 2px 0 #ffe066, 0 0 0 3px #fff;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s, border-color 0.18s, transform 0.13s cubic-bezier(.4,1.4,.6,1);
+        }
+        .pagination-btn:disabled {
+            background: #b3e5fc;
+            color: #aaa;
+            border-color: #b3e5fc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .pagination-info {
+            color: #2053a2;
+            font-size: 1.1em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        /* 详情弹窗样式 */
+        .project-modal {
+            position: fixed;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.18);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fffbe6;
+            border: 4px solid #2053a2;
+            border-radius: 16px;
+            box-shadow: 6px 6px 0 #2053a2;
+            padding: 32px 32px 24px 32px;
+            min-width: 320px;
+            max-width: 90vw;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            right: 18px;
+            top: 10px;
+            font-size: 2em;
+            color: #2053a2;
+            cursor: pointer;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: #ff6f61;
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+        .modal-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 2.5px solid #3ec0fd;
+            background: #fff;
+            margin-right: 16px;
+            object-fit: contain;
+        }
+        .modal-title {
+            font-size: 1.4em;
+            color: #2053a2;
+            font-weight: bold;
+            flex: 1;
+        }
+        .modal-body {
+            color: #2053a2;
+        }
+        .modal-info {
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .modal-info span {
+            color: #183a6b;
+            font-weight: bold;
+        }
+        .modal-info a {
+            color: #00bfff;
+            text-decoration: none;
+        }
+        .modal-info a:hover {
+            text-decoration: underline;
+        }
+        .modal-desc {
+            margin-top: 16px;
+            color: #333;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        .project-card.empty:hover .pixel-icon {
+            animation: pixelJumpActive 0.5s;
+        }
+        @keyframes pixelJumpActive {
+            0% { transform: translateY(0); }
+            40% { transform: translateY(-12px) scale(1.15); }
+            100% { transform: translateY(0); }
+        }
+        @media (max-width: 700px) {
+            .project-card {
+                padding-bottom: 54px;
+            }
+            .detail-btn {
+                right: 10px;
+                bottom: 10px;
+                font-size: 1.08em;
+                padding: 7px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pixel-border"></div>
+    <div class="header-bar">
+        <img class="avatar" src="xioal.jpg" alt="头像">
+        <div class="header-center">
+            <div class="header-title">小林的空投项目</div>
+            <div class="header-subtitle">发现优质加密空投机会</div>
+        </div>
+    </div>
+    <div class="main-area">
+        <div class="project-card-list" id="projectCardList">
+            <!-- 卡片内容由JS动态渲染 -->
+        </div>
+        <div class="pagination-bar" id="paginationBar">
+            <button class="pagination-btn" id="prevPage">上一页</button>
+            <span class="pagination-info" id="pageInfo">1 / 1</span>
+            <button class="pagination-btn" id="nextPage">下一页</button>
+        </div>
+        <div class="project-modal" id="projectModal" style="display:none;">
+            <div class="modal-content">
+                <span class="modal-close" id="modalClose">×</span>
+                <div id="modalDetail"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bar" id="footerBar">
+        <div class="footer-content">
+            <div class="footer-links">
+                作者：<a href="https://x.com/YOYOMYOYOA" target="_blank">小林@YOYOMYOYOA</a> |
+                <a href="https://t.me/YOYOZKS" target="_blank">TG@YOYOZKS</a>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabaseUrl = 'https://beodelyfsncmchgzrqce.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlb2RlbHlmc25jbWNoZ3pycWNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjgxNzcsImV4cCI6MjA2NDI0NDE3N30.HhEJ5lv_oOw82FbRkeLeB8pRQR8-I5jZAiIfZ3-wJnU'
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const projectList = document.getElementById('projectCardList');
+    const paginationInfo = document.getElementById('pageInfo');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    
+    let currentPage = 1;
+    const itemsPerPage = 8;
+    let totalProjects = 0;
+
+    async function fetchProjects() {
+        const { data, error, count } = await supabase
+            .from('projects')
+            .select('*', { count: 'exact' })
+            .order('date', { ascending: false })
+            .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+
+        if (error) {
+            console.error('获取项目失败:', error);
+            return [];
+        }
+
+        totalProjects = count;
+        return data;
+    }
+
+    async function renderProjects() {
+        const projects = await fetchProjects();
+        projectList.innerHTML = '';
+        
+        if (!projects || projects.length === 0) {
+            projectList.innerHTML = '<div class="project-card empty"></div>';
+            return;
+        }
+
+        projects.forEach(project => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.innerHTML = `
+                <img src="${project.avatar}" class="project-avatar" alt="${project.name}">
+                <div class="project-title">${project.name}</div>
+                <div class="project-desc">${project.description}</div>
+                <div class="project-meta-group">
+                    <div class="project-meta">类型：<span>${project.type}</span></div>
+                    <div class="project-meta">融资：<span>${project.fund}</span></div>
+                    <div class="project-meta">推特：<a href="${project.twitter}" target="_blank">${project.twitter_name}</a></div>
+                    <div class="project-meta">脚本：<a href="${project.script}" target="_blank">GitHub</a></div>
+                </div>
+                <button class="detail-btn" data-id="${project.id}">查看详情</button>
+            `;
+            projectList.appendChild(card);
+        });
+
+        // 添加空卡片以保持布局
+        const remainingSlots = itemsPerPage - projects.length;
+        for (let i = 0; i < remainingSlots; i++) {
+            const emptyCard = document.createElement('div');
+            emptyCard.className = 'project-card empty';
+            emptyCard.innerHTML = `<div class="empty-placeholder"><span class="pixel-icon">🟦</span><span>敬请期待</span></div>`;
+            projectList.appendChild(emptyCard);
+        }
+    }
+
+    function updatePagination() {
+        const totalPages = Math.max(1, Math.ceil(totalProjects / itemsPerPage));
+        paginationInfo.textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+    }
+
+    prevBtn.onclick = () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderProjects();
+            updatePagination();
+        }
+    };
+
+    nextBtn.onclick = () => {
+        const totalPages = Math.max(1, Math.ceil(totalProjects / itemsPerPage));
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderProjects();
+            updatePagination();
+        }
+    };
+
+    projectList.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('detail-btn')) {
+            const btn = e.target;
+            const oldHtml = btn.innerHTML;
+            btn.classList.add('loading');
+            btn.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+            setTimeout(() => {
+                btn.classList.remove('loading');
+                btn.innerHTML = oldHtml;
+            }, 600);
+            const id = btn.getAttribute('data-id');
+            const { data, error } = await supabase
+                .from('projects')
+                .select('*')
+                .eq('id', id)
+                .single();
+            if (error) return;
+            const modal = document.createElement('div');
+            modal.className = 'project-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img src="${data.avatar}" class="modal-avatar" alt="${data.name}">
+                        <div class="modal-title">${data.name}</div>
+                        <button class="modal-close" onclick="this.closest('.project-modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-info">类型：<span>${data.type}</span></div>
+                        <div class="modal-info">融资：<span>${data.fund}</span></div>
+                        <div class="modal-info">推特：<a href="${data.twitter}" target="_blank">${data.twitter_name}</a></div>
+                        <div class="modal-info">脚本：<a href="${data.script}" target="_blank">GitHub</a></div>
+                        <div class="modal-desc">${data.description}</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+    });
+
+    // 初始加载
+    await renderProjects();
+    updatePagination();
+
+    const pagBar = document.querySelector('.pagination-bar');
+    const footerBar = document.querySelector('.footer-bar');
+    function checkBottom() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        const winH = window.innerHeight;
+        const docH = document.body.scrollHeight;
+        if (scrollY + winH >= docH - 10) {
+            pagBar.classList.add('show');
+            footerBar.classList.add('show');
+        } else {
+            pagBar.classList.remove('show');
+            footerBar.classList.remove('show');
+        }
+    }
+    window.addEventListener('scroll', checkBottom);
+    window.addEventListener('resize', checkBottom);
+    setTimeout(checkBottom, 300);
+    </script>
+</body>
+</html> 

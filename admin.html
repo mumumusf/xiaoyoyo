@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目后台管理</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        body {
+            background: #3ec0fd;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #2053a2;
+            margin: 0;
+            padding: 0;
+        }
+        .admin-container {
+            max-width: 520px;
+            margin: 48px auto;
+            background: #fffbe6;
+            border-radius: 18px;
+            box-shadow: 0 0 0 4px #fff, 8px 8px 0 0 #2053a2;
+            padding: 38px 32px 28px 32px;
+            border: 4px solid #2053a2;
+        }
+        h2 {
+            text-align: center;
+            color: #2053a2;
+            margin-bottom: 28px;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-size: 2em;
+            letter-spacing: 2px;
+        }
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #183a6b;
+            font-weight: bold;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2.5px solid #3ec0fd;
+            border-radius: 10px;
+            font-size: 1.08em;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f7fbff;
+            box-shadow: 0 2px 0 #ffe066;
+            transition: border-color 0.18s, box-shadow 0.18s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #2053a2;
+            box-shadow: 0 2px 0 #2053a2;
+            outline: none;
+        }
+        .form-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .submit-btn {
+            width: 100%;
+            background: #2053a2;
+            color: #fff;
+            border: 2.5px solid #2053a2;
+            border-radius: 12px;
+            padding: 14px 0;
+            font-size: 1.13em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 2px 2px 0 #ffe066, 0 0 0 3px #fff;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s, border-color 0.18s, transform 0.13s cubic-bezier(.4,1.4,.6,1);
+        }
+        .submit-btn:hover {
+            background: #ffe066;
+            color: #2053a2;
+            border-color: #ffe066;
+            box-shadow: 4px 4px 0 #2053a2, 0 0 0 4px #ffe066;
+            transform: scale(1.04);
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            color: #888;
+            border-color: #b3e5fc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .success {
+            color: #43a047;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+        .error {
+            color: #e53935;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            font-size: 1.2em;
+            color: #2053a2;
+        }
+        .project-list {
+            margin-top: 40px;
+            border-top: 2px dashed #e3f2fd;
+            padding-top: 24px;
+        }
+        .project-list table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 1.05em;
+            background: #fffbe6;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 2px #3ec0fd;
+        }
+        .project-list th {
+            background: #f7fbff;
+            padding: 10px 6px;
+            text-align: left;
+            border-bottom: 2px solid #e3f2fd;
+            color: #2053a2;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .project-list td {
+            padding: 10px 6px;
+            border-bottom: 1px dashed #e3f2fd;
+            vertical-align: middle;
+        }
+        .project-list img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #3ec0fd;
+            background: #fff;
+            box-shadow: 0 2px 0 #ffe066;
+        }
+        .project-list a {
+            color: #00bfff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .project-list a:hover {
+            text-decoration: underline;
+            color: #ffb300;
+        }
+        .action-btn {
+            padding: 7px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.05em;
+            margin-right: 4px;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-weight: bold;
+            border: 2px solid #2053a2;
+            box-shadow: 2px 2px 0 #ffe066, 0 0 0 2px #fff;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s, border-color 0.18s, transform 0.13s cubic-bezier(.4,1.4,.6,1);
+        }
+        .edit-btn {
+            background: #e3f2fd;
+            color: #2053a2;
+            border: 2px solid #3ec0fd;
+        }
+        .edit-btn:hover {
+            background: #ffe066;
+            color: #2053a2;
+            border-color: #ffe066;
+            box-shadow: 4px 4px 0 #2053a2, 0 0 0 4px #ffe066;
+            transform: scale(1.04);
+        }
+        .delete-btn {
+            background: #ffebee;
+            color: #e53935;
+            border: 2px solid #ffcdd2;
+        }
+        .delete-btn:hover {
+            background: #e53935;
+            color: #fff;
+            border-color: #e53935;
+            box-shadow: 4px 4px 0 #ffcdd2, 0 0 0 4px #e53935;
+            transform: scale(1.04);
+        }
+        .empty-list {
+            text-align: center;
+            color: #b0bec5;
+            padding: 32px 0;
+            font-size: 1.15em;
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            opacity: 0.7;
+            user-select: none;
+        }
+        @media (max-width: 700px) {
+            .admin-container {
+                max-width: 99vw;
+                padding: 12px 2vw 8px 2vw;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            .form-group input, .form-group textarea {
+                font-size: 1em;
+                padding: 7px 7px;
+            }
+            .submit-btn {
+                font-size: 1em;
+                padding: 10px 0;
+            }
+            .project-list th, .project-list td {
+                padding: 7px 2px;
+            }
+            .project-list img {
+                width: 28px;
+                height: 28px;
+                border-radius: 6px;
+            }
+            .action-btn {
+                font-size: 0.98em;
+                padding: 5px 10px;
+                border-radius: 7px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="adminLock" style="position:fixed;z-index:9999;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(62,192,253,0.98);">
+        <div style="background:#fffbe6;border:4px solid #2053a2;border-radius:18px;box-shadow:0 0 0 4px #fff,8px 8px 0 0 #2053a2;padding:38px 32px 28px 32px;min-width:320px;max-width:90vw;text-align:center;">
+            <div style="font-size:1.3em;font-family:'ZCOOL KuaiLe','PingFang SC','Microsoft YaHei',sans-serif;font-weight:bold;color:#2053a2;margin-bottom:18px;">后台访问验证</div>
+            <input id="adminPwd" type="password" placeholder="请输入密码" style="width:80%;padding:12px 10px;font-size:1.1em;border:2px solid #3ec0fd;border-radius:8px;margin-bottom:18px;outline:none;">
+            <br>
+            <button id="adminPwdBtn" style="background:#2053a2;color:#fff;border:none;border-radius:8px;padding:10px 36px;font-size:1.1em;font-family:'ZCOOL KuaiLe','PingFang SC','Microsoft YaHei',sans-serif;cursor:pointer;box-shadow:2px 2px 0 #ffe066;">进入后台</button>
+            <div id="adminPwdTip" style="color:#e53935;margin-top:12px;display:none;font-size:1em;"></div>
+        </div>
+    </div>
+    <div class="admin-container">
+        <h2>项目后台管理</h2>
+        <form id="projectForm">
+            <div class="form-group">
+                <label>头像URL</label>
+                <input type="url" name="avatar" required placeholder="https://xxx.png">
+            </div>
+            <div class="form-group">
+                <label>项目名称</label>
+                <input type="text" name="name" required placeholder="如：Blast">
+            </div>
+            <div class="form-group">
+                <label>项目类型</label>
+                <input type="text" name="type" required placeholder="如：Layer2/DeFi/跨链等">
+            </div>
+            <div class="form-group">
+                <label>简介</label>
+                <textarea name="description" required placeholder="一句话介绍项目"></textarea>
+            </div>
+            <div class="form-group">
+                <label>项目脚本（GitHub链接）</label>
+                <input type="url" name="script" required placeholder="https://github.com/xxx/xxx">
+            </div>
+            <div class="form-group">
+                <label>融资</label>
+                <input type="text" name="fund" required placeholder="如：Paradigm, 2000万美元">
+            </div>
+            <div class="form-group">
+                <label>推特链接</label>
+                <input type="url" name="twitter" required placeholder="https://twitter.com/xxx">
+            </div>
+            <div class="form-group">
+                <label>推特名称</label>
+                <input type="text" name="twitter_name" required placeholder="如：@Blast_L2">
+            </div>
+            <div class="form-group">
+                <label>发布日期</label>
+                <input type="date" name="date" required>
+            </div>
+            <input type="hidden" name="editIndex" id="editIndex">
+            <button type="submit" class="submit-btn" id="submitBtn">上传项目</button>
+        </form>
+        <div class="success" id="successMsg" style="display:none;"></div>
+        <div class="error" id="errorMsg" style="display:none;"></div>
+        <div class="project-list" id="projectList"></div>
+    </div>
+    <div class="loading" id="loading" style="display:none;">加载中...</div>
+    <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabaseUrl = 'https://beodelyfsncmchgzrqce.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlb2RlbHlmc25jbWNoZ3pycWNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjgxNzcsImV4cCI6MjA2NDI0NDE3N30.HhEJ5lv_oOw82FbRkeLeB8pRQR8-I5jZAiIfZ3-wJnU'
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const form = document.getElementById('projectForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const successMsg = document.getElementById('successMsg');
+    const errorMsg = document.getElementById('errorMsg');
+    const projectList = document.getElementById('projectList');
+    const loading = document.getElementById('loading');
+    let editingId = null;
+
+    function showLoading() {
+        loading.style.display = 'flex';
+    }
+
+    function hideLoading() {
+        loading.style.display = 'none';
+    }
+
+    function showSuccess(msg) {
+        successMsg.textContent = msg;
+        successMsg.style.display = 'block';
+        errorMsg.style.display = 'none';
+        setTimeout(() => {
+            successMsg.style.display = 'none';
+        }, 2000);
+    }
+
+    function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'block';
+        successMsg.style.display = 'none';
+        setTimeout(() => {
+            errorMsg.style.display = 'none';
+        }, 3000);
+    }
+
+    async function fetchProjects() {
+        showLoading();
+        try {
+            const { data, error } = await supabase
+                .from('projects')
+                .select('*')
+                .order('date', { ascending: false });
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            showError('获取项目失败: ' + error.message);
+            return [];
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function renderList() {
+        const projects = await fetchProjects();
+        if (projects.length === 0) {
+            projectList.innerHTML = '<div class="empty-list">暂无项目</div>';
+            return;
+        }
+
+        let html = '<table>';
+        html += '<tr><th>头像</th><th>名称</th><th>类型</th><th>简介</th><th>脚本</th><th>融资</th><th>推特</th><th>推特名</th><th>日期</th><th>操作</th></tr>';
+        
+        projects.forEach(project => {
+            html += `
+                <tr>
+                    <td><img src="${project.avatar}" alt="${project.name}"></td>
+                    <td>${project.name}</td>
+                    <td>${project.type}</td>
+                    <td>${project.description}</td>
+                    <td><a href="${project.script}" target="_blank">GitHub</a></td>
+                    <td>${project.fund}</td>
+                    <td><a href="${project.twitter}" target="_blank">链接</a></td>
+                    <td>${project.twitter_name}</td>
+                    <td>${project.date}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="window.editProject('${project.id}')">编辑</button>
+                        <button class="action-btn delete-btn" onclick="window.deleteProject('${project.id}')">删除</button>
+                    </td>
+                </tr>
+            `;
+        });
+        html += '</table>';
+        projectList.innerHTML = html;
+    }
+
+    window.editProject = async function(id) {
+        showLoading();
+        try {
+            const { data, error } = await supabase
+                .from('projects')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+
+            for (const key in data) {
+                if (form.elements[key] && key !== 'id') {
+                    form.elements[key].value = data[key];
+                }
+            }
+            editingId = id;
+            submitBtn.textContent = '更新项目';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+            showError('获取项目失败: ' + error.message);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    window.deleteProject = async function(id) {
+        if (!confirm('确定要删除该项目吗？')) return;
+        showLoading();
+        try {
+            const { error } = await supabase
+                .from('projects')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+            showSuccess('删除成功！');
+            renderList();
+        } catch (error) {
+            showError('删除失败: ' + error.message);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    form.onsubmit = async function(e) {
+        e.preventDefault();
+        showLoading();
+        submitBtn.disabled = true;
+
+        try {
+            const formData = new FormData(form);
+            // 只保留数据库字段
+            const data = {
+                avatar: formData.get('avatar'),
+                name: formData.get('name'),
+                type: formData.get('type'),
+                description: formData.get('description'),
+                script: formData.get('script'),
+                fund: formData.get('fund'),
+                twitter: formData.get('twitter'),
+                twitter_name: formData.get('twitter_name'),
+                date: formData.get('date')
+            };
+
+            if (editingId) {
+                const { error } = await supabase
+                    .from('projects')
+                    .update(data)
+                    .eq('id', editingId);
+
+                if (error) throw error;
+                showSuccess('更新成功！');
+            } else {
+                const { error } = await supabase
+                    .from('projects')
+                    .insert([data]);
+
+                if (error) throw error;
+                showSuccess('上传成功！');
+            }
+
+            form.reset();
+            editingId = null;
+            submitBtn.textContent = '上传项目';
+            renderList();
+        } catch (error) {
+            showError((editingId ? '更新' : '上传') + '失败: ' + error.message);
+        } finally {
+            hideLoading();
+            submitBtn.disabled = false;
+        }
+    };
+
+    // 初始加载
+    renderList();
+    </script>
+    <script>
+    document.getElementById('adminPwdBtn').onclick = function() {
+        const v = document.getElementById('adminPwd').value;
+        if(v === '1314520sw') {
+            document.getElementById('adminLock').style.display = 'none';
+        } else {
+            document.getElementById('adminPwdTip').innerText = '密码错误！';
+            document.getElementById('adminPwdTip').style.display = 'block';
+        }
+    };
+    document.getElementById('adminPwd').onkeydown = function(e) {
+        if(e.key === 'Enter') document.getElementById('adminPwdBtn').click();
+    };
+    </script>
+</body>
+</html> 
